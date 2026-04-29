@@ -105,7 +105,7 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'Nails by Minh <booking@nailsbyminh.com>',
+          from: 'Nails by Minh <onboarding@resend.dev>',
           to: clientEmail,
           subject: `✅ Booking confirmed — ${bookingDate} at ${bookingTime}`,
           html: `
@@ -136,7 +136,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'Booking Alert <booking@nailsbyminh.com>',
+        from: 'Booking Alert <onboarding@resend.dev>',
         to: MINH_EMAIL,
         subject: `🔔 New booking — ${clientName} on ${bookingDate} at ${bookingTime}`,
         html: `
