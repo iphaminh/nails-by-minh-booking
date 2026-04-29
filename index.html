@@ -8,383 +8,118 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #fff;
-      --bg2: #f7f5f2;
-      --border: #e4e0da;
-      --border2: #ccc8c2;
-      --text: #1a1a1a;
-      --text2: #666;
-      --text3: #999;
-      --gold: #c9a87c;
-      --gold-bg: #faf7f2;
-      --gold-dark: #a8835a;
-      --radius: 10px;
+      --bg:#fff; --bg2:#f7f5f2; --border:#e4e0da; --border2:#ccc8c2;
+      --text:#1a1a1a; --text2:#666; --text3:#999;
+      --gold:#c9a87c; --gold-bg:#faf7f2; --radius:10px;
     }
-
-    body {
-      font-family: 'Jost', sans-serif;
-      background: #f0ece6;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 20px 0 40px;
-    }
-
-    .phone {
-      background: var(--bg);
-      width: 100%;
-      max-width: 420px;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    @media (min-width: 460px) {
-      .phone { min-height: auto; }
-      body { align-items: center; padding: 40px 20px; }
-    }
-
-    /* SCREENS */
-    .screen { display: none; flex-direction: column; flex: 1; }
-    .screen.on { display: flex; }
-
-    /* HEADER */
-    .hdr {
-      background: #111;
-      padding: 1.5rem 1.25rem 0;
-      color: #f5f0ea;
-      flex-shrink: 0;
-    }
-    .brand {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 26px;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      color: #f5f0ea;
-    }
-    .brand em { color: var(--gold); font-style: normal; }
-    .tagline {
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #888;
-      margin-top: 2px;
-    }
-    .tabs {
-      display: flex;
-      margin-top: 1rem;
-      border-bottom: 0.5px solid #333;
-    }
-    .tab {
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: #666;
-      padding: 10px 16px;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: all 0.2s;
-      user-select: none;
-    }
-    .tab.act { color: var(--gold); border-bottom-color: var(--gold); }
-
-    /* BODY */
-    .body {
-      flex: 1;
-      padding: 1.25rem;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    /* CATEGORY LABEL */
-    .cat {
-      font-size: 9px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text3);
-      margin: 1.25rem 0 8px;
-    }
-    .cat:first-child { margin-top: 0; }
-
-    /* SERVICE ROW */
-    .svc {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 11px 13px;
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      margin-bottom: 6px;
-      cursor: pointer;
-      transition: all 0.15s;
-      background: var(--bg);
-    }
-    .svc:hover, .svc.sel {
-      border-color: var(--gold);
-      background: var(--gold-bg);
-    }
-    .svc.sel .chk { opacity: 1; }
-    .svc-name { font-size: 13px; font-weight: 500; color: var(--text); }
-    .svc-desc { font-size: 11px; color: var(--text3); margin-top: 3px; line-height: 1.4; max-width: 210px; }
-    .svc-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; padding-left: 8px; }
-    .price {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--gold);
-      font-family: 'Cormorant Garamond', serif;
-    }
-    .chk {
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      background: var(--gold);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 10px; color: #111;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-
-    /* ADDON CHIPS */
-    .addon-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 6px; }
-    .chip {
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 9px 11px;
-      cursor: pointer;
-      transition: all 0.15s;
-      background: var(--bg);
-    }
-    .chip:hover, .chip.sel { border-color: var(--gold); background: var(--gold-bg); }
-    .chip-name { font-size: 12px; font-weight: 500; color: var(--text); }
-    .chip-price { font-size: 11px; color: var(--gold); margin-top: 2px; }
-
-    /* INSPO GRID */
-    .art-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
-    .art-card {
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .art-card:hover, .art-card.sel { border-color: var(--gold); border-width: 1.5px; }
-    .art-thumb { height: 80px; display: flex; align-items: center; justify-content: center; }
-    .art-label { padding: 8px 10px; background: var(--bg); }
-    .art-title { font-size: 12px; font-weight: 500; color: var(--text); }
-    .art-price { font-size: 11px; color: var(--gold); margin-top: 1px; }
-
-    /* UPLOAD ZONE */
-    .upload-z {
-      border: 0.5px dashed var(--border2);
-      border-radius: var(--radius);
-      padding: 1.25rem;
-      text-align: center;
-      cursor: pointer;
-      margin-bottom: 14px;
-      transition: border 0.15s;
-    }
-    .upload-z:hover { border-color: var(--gold); }
-    .upload-z p { font-size: 12px; color: var(--text2); }
-    .upload-z span { font-size: 11px; color: var(--text3); display: block; margin-top: 3px; }
-
-    /* DATE ROW */
-    .date-row {
-      display: flex; gap: 6px;
-      overflow-x: auto; padding-bottom: 4px;
-      margin-bottom: 14px;
-      -webkit-overflow-scrolling: touch;
-    }
-    .date-row::-webkit-scrollbar { display: none; }
-    .dc {
-      flex-shrink: 0;
-      text-align: center;
-      padding: 9px 13px;
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: all 0.15s;
-      background: var(--bg);
-    }
-    .dc:hover, .dc.sel { border-color: var(--gold); background: var(--gold-bg); }
-    .dc-day { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); }
-    .dc-num { font-size: 20px; font-weight: 500; color: var(--text); font-family: 'Cormorant Garamond', serif; }
-
-    /* TIME GRID */
-    .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px; }
-    .t-btn {
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 10px 4px;
-      font-size: 12px; text-align: center;
-      cursor: pointer;
-      transition: all 0.15s;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Jost', sans-serif;
-    }
-    .t-btn:hover, .t-btn.sel { border-color: var(--gold); background: var(--gold-bg); }
-    .t-btn.full { color: var(--text3); text-decoration: line-through; cursor: default; }
-    .t-btn.full:hover { border-color: var(--border); background: var(--bg); }
-
-    /* INPUTS */
-    label.lbl {
-      font-size: 10px; letter-spacing: 1.5px;
-      text-transform: uppercase; color: var(--text3);
-      display: block; margin-bottom: 5px;
-    }
-    input.inp, textarea.inp {
-      width: 100%;
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 11px 13px;
-      font-size: 13px;
-      font-family: 'Jost', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      outline: none;
-      margin-bottom: 14px;
-      transition: border 0.15s;
-      -webkit-appearance: none;
-    }
-    input.inp:focus, textarea.inp:focus { border-color: var(--gold); }
-    textarea.inp { resize: none; height: 80px; }
-
-    /* TOGGLE BOX */
-    .tog-box {
-      background: var(--bg2);
-      border-radius: var(--radius);
-      padding: 13px 14px;
-      margin-bottom: 14px;
-    }
-    .tog-title { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
-    .tog-sub { font-size: 11px; color: var(--text2); margin-bottom: 10px; line-height: 1.4; }
-    .tog-row {
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 13px; color: var(--text); margin-bottom: 8px;
-    }
-    .tog-row:last-child { margin-bottom: 0; }
-    .tog {
-      width: 38px; height: 21px; border-radius: 20px;
-      background: var(--border2); cursor: pointer;
-      position: relative; transition: background 0.2s; flex-shrink: 0;
-    }
-    .tog.on { background: var(--gold); }
-    .tog::after {
-      content: '';
-      position: absolute;
-      width: 17px; height: 17px;
-      border-radius: 50%; background: #fff;
-      top: 2px; left: 2px;
-      transition: left 0.2s;
-    }
-    .tog.on::after { left: 19px; }
-
-    /* SUMMARY BOX */
-    .sum-box {
-      background: var(--bg2);
-      border-radius: var(--radius);
-      padding: 13px 14px;
-      margin-bottom: 14px;
-    }
-    .sum-box-title { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 8px; }
-    .sum-row {
-      display: flex; justify-content: space-between;
-      font-size: 13px; padding: 7px 0;
-      border-bottom: 0.5px solid var(--border);
-      color: var(--text);
-    }
-    .sum-row:last-child { border-bottom: none; font-weight: 500; }
-    .sum-lbl { color: var(--text2); }
-
-    /* BUTTONS */
-    .btn {
-      width: 100%;
-      background: #111; color: #f5f0ea;
-      border: none; border-radius: var(--radius);
-      padding: 14px; font-size: 13px; font-weight: 500;
-      cursor: pointer; font-family: 'Jost', sans-serif;
-      letter-spacing: 0.5px;
-      transition: opacity 0.15s;
-      -webkit-appearance: none;
-    }
-    .btn:hover { opacity: 0.85; }
-    .btn:active { transform: scale(0.98); }
-    .btn-wrap { padding: 0 1.25rem 1.25rem; }
-
-    /* FOOTER NAV */
-    .ftr {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 11px 1.25rem;
-      border-top: 0.5px solid var(--border);
-      flex-shrink: 0;
-    }
-    .bk, .nxt {
-      font-size: 12px; letter-spacing: 0.5px;
-      cursor: pointer; background: none; border: none;
-      font-family: 'Jost', sans-serif;
-    }
-    .bk { color: var(--text2); }
-    .nxt { color: var(--gold); font-weight: 500; }
-    .dots { display: flex; gap: 5px; align-items: center; }
-    .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border2); }
-    .dot.on { background: var(--gold); }
-
-    /* CONFIRM */
-    .confirm-ring {
-      width: 60px; height: 60px; border-radius: 50%;
-      border: 1.5px solid var(--gold);
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1rem;
-      font-size: 22px; color: var(--gold);
-    }
-
-    /* DEAL CARDS */
-    .deal {
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 13px 14px;
-      margin-bottom: 8px;
-    }
-    .deal.hot { border-color: var(--gold); background: var(--gold-bg); }
-    .deal-tag { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
-    .deal-name { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 3px; font-family: 'Cormorant Garamond', serif; }
-    .deal-note { font-size: 11px; color: var(--text2); }
-
-    /* Q CHIPS */
-    .q-chips { margin-bottom: 14px; }
-    .q-chip {
-      display: inline-block;
-      border: 0.5px solid var(--border);
-      border-radius: 20px;
-      padding: 6px 13px;
-      font-size: 11px; color: var(--text2);
-      cursor: pointer; margin: 0 5px 6px 0;
-      transition: border 0.15s;
-      font-family: 'Jost', sans-serif;
-    }
-    .q-chip:hover { border-color: var(--gold); color: var(--text); }
-
-    /* HINT BOX */
-    .hint {
-      background: var(--bg2);
-      border-radius: var(--radius);
-      padding: 12px 14px;
-      font-size: 12px;
-      color: var(--text2);
-      line-height: 1.5;
-      margin-bottom: 14px;
-    }
+    body { font-family:'Jost',sans-serif; background:#f0ece6; min-height:100vh; display:flex; justify-content:center; align-items:flex-start; padding:20px 0 40px; }
+    .phone { background:var(--bg); width:100%; max-width:420px; border-radius:24px; overflow:hidden; box-shadow:0 8px 40px rgba(0,0,0,0.12); min-height:100vh; display:flex; flex-direction:column; }
+    @media(min-width:460px){ .phone{min-height:auto;} body{align-items:center;padding:40px 20px;} }
+    .screen { display:none; flex-direction:column; flex:1; }
+    .screen.on { display:flex; }
+    .hdr { background:#111; padding:1.5rem 1.25rem 0; color:#f5f0ea; flex-shrink:0; }
+    .brand { font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:500; color:#f5f0ea; }
+    .brand em { color:var(--gold); font-style:normal; }
+    .tagline { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#888; margin-top:2px; }
+    .tabs { display:flex; margin-top:1rem; border-bottom:0.5px solid #333; }
+    .tab { font-size:11px; letter-spacing:1px; text-transform:uppercase; color:#666; padding:10px 16px; cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; user-select:none; }
+    .tab.act { color:var(--gold); border-bottom-color:var(--gold); }
+    .body { flex:1; padding:1.25rem; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+    .cat { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--text3); margin:1.25rem 0 8px; }
+    .cat:first-child { margin-top:0; }
+    .svc { display:flex; justify-content:space-between; align-items:flex-start; padding:11px 13px; border:0.5px solid var(--border); border-radius:var(--radius); margin-bottom:6px; cursor:pointer; transition:all 0.15s; background:var(--bg); }
+    .svc:hover,.svc.sel { border-color:var(--gold); background:var(--gold-bg); }
+    .svc.sel .chk { opacity:1; }
+    .svc-name { font-size:13px; font-weight:500; color:var(--text); }
+    .svc-desc { font-size:11px; color:var(--text3); margin-top:3px; line-height:1.4; max-width:210px; }
+    .svc-right { display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex-shrink:0; padding-left:8px; }
+    .price { font-size:14px; font-weight:500; color:var(--gold); font-family:'Cormorant Garamond',serif; }
+    .chk { width:18px; height:18px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; font-size:10px; color:#111; opacity:0; transition:opacity 0.15s; }
+    .addon-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-bottom:6px; }
+    .chip { border:0.5px solid var(--border); border-radius:var(--radius); padding:9px 11px; cursor:pointer; transition:all 0.15s; background:var(--bg); }
+    .chip:hover,.chip.sel { border-color:var(--gold); background:var(--gold-bg); }
+    .chip-name { font-size:12px; font-weight:500; color:var(--text); }
+    .chip-price { font-size:11px; color:var(--gold); margin-top:2px; }
+    .art-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:10px; }
+    .art-card { border:0.5px solid var(--border); border-radius:var(--radius); overflow:hidden; cursor:pointer; transition:all 0.15s; }
+    .art-card:hover,.art-card.sel { border-color:var(--gold); border-width:1.5px; }
+    .art-thumb { height:80px; display:flex; align-items:center; justify-content:center; }
+    .art-label { padding:8px 10px; background:var(--bg); }
+    .art-title { font-size:12px; font-weight:500; color:var(--text); }
+    .art-price { font-size:11px; color:var(--gold); margin-top:1px; }
+    .upload-z { border:0.5px dashed var(--border2); border-radius:var(--radius); padding:1.25rem; text-align:center; cursor:pointer; margin-bottom:14px; transition:border 0.15s; }
+    .upload-z:hover { border-color:var(--gold); }
+    .upload-z p { font-size:12px; color:var(--text2); }
+    .upload-z span { font-size:11px; color:var(--text3); display:block; margin-top:3px; }
+    /* DATE PICKER */
+    .month-nav { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+    .month-label { font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:500; color:var(--text); }
+    .month-btn { background:none; border:0.5px solid var(--border); border-radius:6px; width:28px; height:28px; cursor:pointer; font-size:14px; color:var(--text2); display:flex; align-items:center; justify-content:center; }
+    .month-btn:hover { border-color:var(--gold); color:var(--gold); }
+    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:14px; }
+    .cal-day-label { font-size:10px; text-align:center; color:var(--text3); padding:4px 0; }
+    .cal-day { aspect-ratio:1; border-radius:50%; border:none; background:transparent; font-size:13px; cursor:pointer; color:var(--text); transition:all 0.15s; display:flex; align-items:center; justify-content:center; }
+    .cal-day:hover { background:var(--bg2); }
+    .cal-day.sel { background:var(--gold); color:#111; font-weight:500; }
+    .cal-day.past,.cal-day.off { color:var(--text3); cursor:default; }
+    .cal-day.past:hover,.cal-day.off:hover { background:transparent; }
+    .time-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:16px; }
+    .t-btn { border:0.5px solid var(--border); border-radius:var(--radius); padding:10px 4px; font-size:12px; text-align:center; cursor:pointer; transition:all 0.15s; background:var(--bg); color:var(--text); font-family:'Jost',sans-serif; }
+    .t-btn:hover { border-color:var(--gold); background:var(--gold-bg); }
+    .t-btn.sel { border-color:var(--gold); background:var(--gold-bg); font-weight:500; }
+    .t-btn.full { color:var(--text3); text-decoration:line-through; cursor:default; }
+    .t-btn.full:hover { border-color:var(--border); background:var(--bg); }
+    label.lbl { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); display:block; margin-bottom:5px; }
+    input.inp,textarea.inp { width:100%; border:0.5px solid var(--border); border-radius:var(--radius); padding:11px 13px; font-size:13px; font-family:'Jost',sans-serif; background:var(--bg); color:var(--text); outline:none; margin-bottom:14px; transition:border 0.15s; -webkit-appearance:none; }
+    input.inp:focus,textarea.inp:focus { border-color:var(--gold); }
+    textarea.inp { resize:none; height:80px; }
+    .tog-box { background:var(--bg2); border-radius:var(--radius); padding:13px 14px; margin-bottom:14px; }
+    .tog-title { font-size:12px; font-weight:500; color:var(--text); margin-bottom:4px; }
+    .tog-sub { font-size:11px; color:var(--text2); margin-bottom:10px; line-height:1.4; }
+    .tog-row { display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--text); margin-bottom:8px; }
+    .tog-row:last-child { margin-bottom:0; }
+    .tog { width:38px; height:21px; border-radius:20px; background:var(--border2); cursor:pointer; position:relative; transition:background 0.2s; flex-shrink:0; }
+    .tog.on { background:var(--gold); }
+    .tog::after { content:''; position:absolute; width:17px; height:17px; border-radius:50%; background:#fff; top:2px; left:2px; transition:left 0.2s; }
+    .tog.on::after { left:19px; }
+    .sum-box { background:var(--bg2); border-radius:var(--radius); padding:13px 14px; margin-bottom:14px; }
+    .sum-box-title { font-size:12px; font-weight:500; color:var(--text); margin-bottom:8px; }
+    .sum-row { display:flex; justify-content:space-between; font-size:13px; padding:7px 0; border-bottom:0.5px solid var(--border); color:var(--text); }
+    .sum-row:last-child { border-bottom:none; font-weight:500; }
+    .sum-lbl { color:var(--text2); }
+    .btn { width:100%; background:#111; color:#f5f0ea; border:none; border-radius:var(--radius); padding:14px; font-size:13px; font-weight:500; cursor:pointer; font-family:'Jost',sans-serif; letter-spacing:0.5px; transition:opacity 0.15s; -webkit-appearance:none; }
+    .btn:hover { opacity:0.85; }
+    .btn:active { transform:scale(0.98); }
+    .btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+    .btn-wrap { padding:0 1.25rem 1.25rem; }
+    .ftr { display:flex; justify-content:space-between; align-items:center; padding:11px 1.25rem; border-top:0.5px solid var(--border); flex-shrink:0; }
+    .bk,.nxt { font-size:12px; letter-spacing:0.5px; cursor:pointer; background:none; border:none; font-family:'Jost',sans-serif; }
+    .bk { color:var(--text2); }
+    .nxt { color:var(--gold); font-weight:500; }
+    .dots { display:flex; gap:5px; align-items:center; }
+    .dot { width:5px; height:5px; border-radius:50%; background:var(--border2); }
+    .dot.on { background:var(--gold); }
+    .confirm-ring { width:60px; height:60px; border-radius:50%; border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-size:22px; color:var(--gold); }
+    .deal { border:0.5px solid var(--border); border-radius:var(--radius); padding:13px 14px; margin-bottom:8px; }
+    .deal.hot { border-color:var(--gold); background:var(--gold-bg); }
+    .deal-tag { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-bottom:4px; }
+    .deal-name { font-size:15px; font-weight:500; color:var(--text); margin-bottom:3px; font-family:'Cormorant Garamond',serif; }
+    .deal-note { font-size:11px; color:var(--text2); }
+    .q-chips { margin-bottom:14px; }
+    .q-chip { display:inline-block; border:0.5px solid var(--border); border-radius:20px; padding:6px 13px; font-size:11px; color:var(--text2); cursor:pointer; margin:0 5px 6px 0; transition:border 0.15s; font-family:'Jost',sans-serif; }
+    .q-chip:hover { border-color:var(--gold); color:var(--text); }
+    .hint { background:var(--bg2); border-radius:var(--radius); padding:12px 14px; font-size:12px; color:var(--text2); line-height:1.5; margin-bottom:14px; }
+    .error-msg { background:#fef2f2; border:0.5px solid #fca5a5; border-radius:var(--radius); padding:10px 13px; font-size:12px; color:#dc2626; margin-bottom:12px; display:none; }
+    .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; margin-right:6px; vertical-align:middle; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .upload-preview { width:100%; height:100px; object-fit:cover; border-radius:var(--radius); margin-bottom:10px; display:none; }
   </style>
 </head>
 <body>
 <div class="phone">
 
-  <!-- ===== SCREEN: HOME / BOOK ===== -->
+  <!-- HOME -->
   <div class="screen on" id="s-home">
     <div class="hdr">
       <div class="brand">Nails by <em>Minh</em></div>
@@ -395,48 +130,18 @@
         <div class="tab" id="tab-deals" onclick="switchTab('deals')">Deals</div>
       </div>
     </div>
-
-    <!-- TAB: BOOK -->
     <div class="body" id="tab-book-body">
       <div class="cat">Artificial nail care</div>
-      <div class="svc" onclick="pick(this,'Acrylic Gel — Full Set','$55')">
-        <div><div class="svc-name">Acrylic gel — full set</div><div class="svc-desc">Strong, long-lasting gel overlay from scratch</div></div>
-        <div class="svc-right"><div class="price">$55</div><div class="chk">✓</div></div>
-      </div>
-      <div class="svc" onclick="pick(this,'Acrylic Gel — Fill-ins','$45+')">
-        <div><div class="svc-name">Acrylic gel — fill-ins</div><div class="svc-desc">Fill grown-out acrylic gel</div></div>
-        <div class="svc-right"><div class="price">$45+</div><div class="chk">✓</div></div>
-      </div>
-      <div class="svc" onclick="pick(this,'Gel X / Builder Gel — Full Set','$55')">
-        <div><div class="svc-name">Gel X / builder gel — full set</div><div class="svc-desc">Soft gel extensions, no acrylic</div></div>
-        <div class="svc-right"><div class="price">$55</div><div class="chk">✓</div></div>
-      </div>
-      <div class="svc" onclick="pick(this,'Gel X / Builder Gel — Fill-ins','$45+')">
-        <div><div class="svc-name">Gel X / builder gel — fill-ins</div><div class="svc-desc">Maintain your existing Gel X set</div></div>
-        <div class="svc-right"><div class="price">$45+</div><div class="chk">✓</div></div>
-      </div>
-      <div class="svc" onclick="pick(this,'Pink & White — Full Set','$70+')">
-        <div><div class="svc-name">Pink & white — full set</div><div class="svc-desc">Classic sculpted look, built-in French</div></div>
-        <div class="svc-right"><div class="price">$70+</div><div class="chk">✓</div></div>
-      </div>
-      <div class="svc" onclick="pick(this,'Pink & White — Fill-ins','$55+')">
-        <div><div class="svc-name">Pink & white — fill-ins</div></div>
-        <div class="svc-right"><div class="price">$55+</div><div class="chk">✓</div></div>
-      </div>
-      <div class="svc" onclick="pick(this,'Ombre — Full Set','$70')">
-        <div><div class="svc-name">Ombre — full set</div><div class="svc-desc">Gradient blend from base to tip</div></div>
-        <div class="svc-right"><div class="price">$70</div><div class="chk">✓</div></div>
-      </div>
-      <div class="svc" onclick="pick(this,'Ombre — Fill-ins','$60')">
-        <div><div class="svc-name">Ombre — fill-ins</div></div>
-        <div class="svc-right"><div class="price">$60</div><div class="chk">✓</div></div>
-      </div>
-
+      <div class="svc" onclick="pick(this,'Acrylic Gel — Full Set','$55')"><div><div class="svc-name">Acrylic gel — full set</div><div class="svc-desc">Strong, long-lasting gel overlay from scratch</div></div><div class="svc-right"><div class="price">$55</div><div class="chk">✓</div></div></div>
+      <div class="svc" onclick="pick(this,'Acrylic Gel — Fill-ins','$45+')"><div><div class="svc-name">Acrylic gel — fill-ins</div><div class="svc-desc">Fill grown-out acrylic gel</div></div><div class="svc-right"><div class="price">$45+</div><div class="chk">✓</div></div></div>
+      <div class="svc" onclick="pick(this,'Gel X / Builder Gel — Full Set','$55')"><div><div class="svc-name">Gel X / builder gel — full set</div><div class="svc-desc">Soft gel extensions, no acrylic</div></div><div class="svc-right"><div class="price">$55</div><div class="chk">✓</div></div></div>
+      <div class="svc" onclick="pick(this,'Gel X / Builder Gel — Fill-ins','$45+')"><div><div class="svc-name">Gel X / builder gel — fill-ins</div><div class="svc-desc">Maintain your existing Gel X set</div></div><div class="svc-right"><div class="price">$45+</div><div class="chk">✓</div></div></div>
+      <div class="svc" onclick="pick(this,'Pink & White — Full Set','$70+')"><div><div class="svc-name">Pink & white — full set</div><div class="svc-desc">Classic sculpted look, built-in French</div></div><div class="svc-right"><div class="price">$70+</div><div class="chk">✓</div></div></div>
+      <div class="svc" onclick="pick(this,'Pink & White — Fill-ins','$55+')"><div><div class="svc-name">Pink & white — fill-ins</div></div><div class="svc-right"><div class="price">$55+</div><div class="chk">✓</div></div></div>
+      <div class="svc" onclick="pick(this,'Ombre — Full Set','$70')"><div><div class="svc-name">Ombre — full set</div><div class="svc-desc">Gradient blend from base to tip</div></div><div class="svc-right"><div class="price">$70</div><div class="chk">✓</div></div></div>
+      <div class="svc" onclick="pick(this,'Ombre — Fill-ins','$60')"><div><div class="svc-name">Ombre — fill-ins</div></div><div class="svc-right"><div class="price">$60</div><div class="chk">✓</div></div></div>
       <div class="cat">Nail art add-ons</div>
-      <div class="svc" onclick="pick(this,'Nail Art — Freehand / Custom','from $20')">
-        <div><div class="svc-name">Nail art — freehand / custom</div><div class="svc-desc">Flowers, gems, foil, any design</div></div>
-        <div class="svc-right"><div class="price">from $20</div><div class="chk">✓</div></div>
-      </div>
+      <div class="svc" onclick="pick(this,'Nail Art — Freehand / Custom','from $20')"><div><div class="svc-name">Nail art — freehand / custom</div><div class="svc-desc">Flowers, gems, foil, any design</div></div><div class="svc-right"><div class="price">from $20</div><div class="chk">✓</div></div></div>
       <div class="addon-grid">
         <div class="chip" onclick="toggleAddon(this,'Cat-eye')"><div class="chip-name">Cat-eye</div><div class="chip-price">$10</div></div>
         <div class="chip" onclick="toggleAddon(this,'Chrome')"><div class="chip-name">Chrome</div><div class="chip-price">$10</div></div>
@@ -445,117 +150,72 @@
         <div class="chip" onclick="toggleAddon(this,'Add tips')"><div class="chip-name">Add tips</div><div class="chip-price">$5</div></div>
         <div class="chip" onclick="toggleAddon(this,'Take off')"><div class="chip-name">Take off</div><div class="chip-price">$8+</div></div>
       </div>
-
       <div class="cat">Pedicure services</div>
-      <div class="svc" onclick="pick(this,'Classic Spa Pedicure','$38')">
-        <div><div class="svc-name">Classic spa pedicure</div><div class="svc-desc">Soak · shape · sugar scrub · 5-min massage · hot stone · polish</div></div>
-        <div class="svc-right"><div class="price">$38</div><div class="chk">✓</div></div>
-      </div>
-      <div class="svc" onclick="pick(this,'Deluxe Spa Pedicure','$55')">
-        <div><div class="svc-name">Deluxe spa pedicure</div><div class="svc-desc">Classic + callus removal · paraffin · 10-min massage · essential oils</div></div>
-        <div class="svc-right"><div class="price">$55</div><div class="chk">✓</div></div>
-      </div>
-      <div class="svc" onclick="pick(this,'Ultimate Signature Pedicure','$70')">
-        <div><div class="svc-name">Ultimate signature pedicure</div><div class="svc-desc">Aromatherapy · scrub & mask · paraffin · 15-min massage · your scent</div></div>
-        <div class="svc-right"><div class="price">$70</div><div class="chk">✓</div></div>
-      </div>
+      <div class="svc" onclick="pick(this,'Classic Spa Pedicure','$38')"><div><div class="svc-name">Classic spa pedicure</div><div class="svc-desc">Soak · shape · sugar scrub · 5-min massage · hot stone · polish</div></div><div class="svc-right"><div class="price">$38</div><div class="chk">✓</div></div></div>
+      <div class="svc" onclick="pick(this,'Deluxe Spa Pedicure','$55')"><div><div class="svc-name">Deluxe spa pedicure</div><div class="svc-desc">Classic + callus removal · paraffin · 10-min massage · essential oils</div></div><div class="svc-right"><div class="price">$55</div><div class="chk">✓</div></div></div>
+      <div class="svc" onclick="pick(this,'Ultimate Signature Pedicure','$70')"><div><div class="svc-name">Ultimate signature pedicure</div><div class="svc-desc">Aromatherapy · scrub & mask · paraffin · 15-min massage · your scent</div></div><div class="svc-right"><div class="price">$70</div><div class="chk">✓</div></div></div>
     </div>
-
-    <!-- TAB: ASK -->
     <div class="body" id="tab-ask-body" style="display:none">
-      <div class="hint">Send Minh a question — she'll reply by text or at your appointment.</div>
+      <div class="hint">Send Minh a question — she'll get back to you by text.</div>
       <div class="q-chips">
-        <div class="q-chip">Gel X vs acrylic — which is better?</div>
-        <div class="q-chip">How long does a full set last?</div>
-        <div class="q-chip">Can I do nail art on short nails?</div>
-        <div class="q-chip">What pedicure do you recommend?</div>
-        <div class="q-chip">How do I care for my nails after?</div>
+        <div class="q-chip" onclick="fillQ(this)">Gel X vs acrylic — which is better?</div>
+        <div class="q-chip" onclick="fillQ(this)">How long does a full set last?</div>
+        <div class="q-chip" onclick="fillQ(this)">Can I do nail art on short nails?</div>
+        <div class="q-chip" onclick="fillQ(this)">What pedicure do you recommend?</div>
+        <div class="q-chip" onclick="fillQ(this)">How do I care for my nails after?</div>
       </div>
       <label class="lbl">Your question</label>
-      <textarea class="inp" placeholder="Ask about services, nail care, designs..."></textarea>
+      <textarea class="inp" id="ask-question" placeholder="Ask about services, nail care, designs..."></textarea>
       <label class="lbl">Your phone (so Minh can reply)</label>
-      <input class="inp" type="tel" placeholder="(408) 000-0000">
-      <button class="btn">Send question →</button>
+      <input class="inp" type="tel" id="ask-phone" placeholder="(408) 000-0000">
+      <button class="btn" onclick="sendQuestion()">Send question →</button>
     </div>
-
-    <!-- TAB: DEALS -->
     <div class="body" id="tab-deals-body" style="display:none">
-      <div class="deal hot">
-        <div class="deal-tag">This week</div>
-        <div class="deal-name">$10 off any pedicure</div>
-        <div class="deal-note">Book before Sunday — sent to subscribers only</div>
-      </div>
-      <div class="deal">
-        <div class="deal-tag">Loyalty reward</div>
-        <div class="deal-name">Every 5th visit is free</div>
-        <div class="deal-note">Tracked automatically when you book with Minh</div>
-      </div>
-      <div class="deal">
-        <div class="deal-tag">Referral</div>
-        <div class="deal-name">Bring a friend — both save $15</div>
-        <div class="deal-note">Applied to your next visit after their first booking</div>
-      </div>
-      <div class="deal">
-        <div class="deal-tag">Bundle deal</div>
-        <div class="deal-name">Full set + nail art for $65</div>
-        <div class="deal-note">Acrylic gel full set + any art add-on</div>
-      </div>
+      <div class="deal hot"><div class="deal-tag">This week</div><div class="deal-name">$10 off any pedicure</div><div class="deal-note">Book before Sunday — subscribers only</div></div>
+      <div class="deal"><div class="deal-tag">Loyalty reward</div><div class="deal-name">Every 5th visit is free</div><div class="deal-note">Tracked automatically when you book with Minh</div></div>
+      <div class="deal"><div class="deal-tag">Referral</div><div class="deal-name">Bring a friend — both save $15</div><div class="deal-note">Applied to your next visit after their first booking</div></div>
+      <div class="deal"><div class="deal-tag">Bundle deal</div><div class="deal-name">Full set + nail art for $65</div><div class="deal-note">Acrylic gel full set + any art add-on</div></div>
       <div style="margin-top:1rem;font-size:12px;color:var(--text2);margin-bottom:8px">Subscribe to get deals sent to your phone:</div>
       <label class="lbl">Your phone number</label>
-      <input class="inp" type="tel" placeholder="(408) 000-0000">
-      <button class="btn">Subscribe for deals →</button>
+      <input class="inp" type="tel" id="deal-phone" placeholder="(408) 000-0000">
+      <button class="btn" onclick="subscribeDeal()">Subscribe for deals →</button>
     </div>
-
     <div class="btn-wrap" id="home-btn-wrap">
       <button class="btn" onclick="goTo('s-inspo')">Continue →</button>
     </div>
   </div>
 
-  <!-- ===== SCREEN: INSPO ===== -->
+  <!-- INSPO -->
   <div class="screen" id="s-inspo">
-    <div class="hdr">
-      <div class="brand">Nails by <em>Minh</em></div>
-      <div class="tagline">Share your inspo</div>
-    </div>
+    <div class="hdr"><div class="brand">Nails by <em>Minh</em></div><div class="tagline">Share your inspo</div></div>
     <div class="body">
       <div class="cat" style="margin-top:0">Pick a style or upload your own</div>
       <div class="art-grid">
-        <div class="art-card sel" onclick="pickArt(this)">
-          <div class="art-thumb" style="background:#e8e8ec">
-            <svg width="50" height="60" viewBox="0 0 50 60"><ellipse cx="25" cy="32" rx="14" ry="20" fill="#b4b2c0"/><ellipse cx="25" cy="18" rx="8" ry="7" fill="#d8d8e0"/></svg>
-          </div>
+        <div class="art-card sel" onclick="pickArt(this,'Chrome silver')">
+          <div class="art-thumb" style="background:#e8e8ec"><svg width="50" height="60" viewBox="0 0 50 60"><ellipse cx="25" cy="32" rx="14" ry="20" fill="#b4b2c0"/><ellipse cx="25" cy="18" rx="8" ry="7" fill="#d8d8e0"/></svg></div>
           <div class="art-label"><div class="art-title">Chrome silver</div><div class="art-price">+$10</div></div>
         </div>
-        <div class="art-card" onclick="pickArt(this)">
-          <div class="art-thumb" style="background:#faf5ee">
-            <svg width="50" height="60" viewBox="0 0 50 60"><ellipse cx="25" cy="32" rx="14" ry="20" fill="#f0e8d8"/><ellipse cx="25" cy="14" rx="12" ry="5" fill="#fff"/></svg>
-          </div>
+        <div class="art-card" onclick="pickArt(this,'French tips')">
+          <div class="art-thumb" style="background:#faf5ee"><svg width="50" height="60" viewBox="0 0 50 60"><ellipse cx="25" cy="32" rx="14" ry="20" fill="#f0e8d8"/><ellipse cx="25" cy="14" rx="12" ry="5" fill="#fff"/></svg></div>
           <div class="art-label"><div class="art-title">French tips</div><div class="art-price">+$10</div></div>
         </div>
-        <div class="art-card" onclick="pickArt(this)">
-          <div class="art-thumb" style="background:#2c1018">
-            <svg width="50" height="60" viewBox="0 0 50 60"><ellipse cx="25" cy="32" rx="14" ry="20" fill="#6b1a2a"/><ellipse cx="25" cy="28" rx="4" ry="12" fill="#c9a87c" opacity="0.5"/></svg>
-          </div>
+        <div class="art-card" onclick="pickArt(this,'Cat-eye')">
+          <div class="art-thumb" style="background:#2c1018"><svg width="50" height="60" viewBox="0 0 50 60"><ellipse cx="25" cy="32" rx="14" ry="20" fill="#6b1a2a"/><ellipse cx="25" cy="28" rx="4" ry="12" fill="#c9a87c" opacity="0.5"/></svg></div>
           <div class="art-label"><div class="art-title">Cat-eye</div><div class="art-price">+$10</div></div>
         </div>
         <div class="art-card" onclick="triggerUpload()">
-          <div class="art-thumb" style="background:#f7f5f2">
-            <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-              <rect x="4" y="4" width="22" height="22" rx="4" stroke="#aaa" stroke-width="1"/>
-              <line x1="15" y1="9" x2="15" y2="21" stroke="#aaa" stroke-width="1.5"/>
-              <line x1="9" y1="15" x2="21" y2="15" stroke="#aaa" stroke-width="1.5"/>
-            </svg>
-          </div>
+          <div class="art-thumb" style="background:#f7f5f2"><svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect x="4" y="4" width="22" height="22" rx="4" stroke="#aaa" stroke-width="1"/><line x1="15" y1="9" x2="15" y2="21" stroke="#aaa" stroke-width="1.5"/><line x1="9" y1="15" x2="21" y2="15" stroke="#aaa" stroke-width="1.5"/></svg></div>
           <div class="art-label"><div class="art-title" style="color:var(--text2)">Upload your own</div><div class="art-price" style="color:var(--text3)">photo / screenshot</div></div>
         </div>
       </div>
       <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleUpload(event)">
+      <img id="upload-preview" class="upload-preview" alt="Your inspo photo">
       <div class="upload-z" onclick="triggerUpload()">
         <p>Or tap here to upload a photo</p>
         <span>Instagram screenshot, Pinterest, anything works</span>
       </div>
       <label class="lbl">Notes for Minh (optional)</label>
-      <textarea class="inp" placeholder="Shape, length, color ideas, special requests..."></textarea>
+      <textarea class="inp" id="inspo-notes" placeholder="Shape, length, color ideas, special requests..."></textarea>
     </div>
     <div class="ftr">
       <button class="bk" onclick="goTo('s-home')">← Back</button>
@@ -564,36 +224,23 @@
     </div>
   </div>
 
-  <!-- ===== SCREEN: DATE & TIME ===== -->
+  <!-- DATE & TIME -->
   <div class="screen" id="s-datetime">
-    <div class="hdr">
-      <div class="brand">Nails by <em>Minh</em></div>
-      <div class="tagline">Pick your date & time</div>
-    </div>
+    <div class="hdr"><div class="brand">Nails by <em>Minh</em></div><div class="tagline">Pick your date & time</div></div>
     <div class="body">
-      <div class="cat" style="margin-top:0">Available dates — April / May 2026</div>
-      <div class="date-row">
-        <div class="dc sel" onclick="pickDate(this)"><div class="dc-day">Fri</div><div class="dc-num">25</div></div>
-        <div class="dc" onclick="pickDate(this)"><div class="dc-day">Sat</div><div class="dc-num">26</div></div>
-        <div class="dc" onclick="pickDate(this)"><div class="dc-day">Mon</div><div class="dc-num">28</div></div>
-        <div class="dc" onclick="pickDate(this)"><div class="dc-day">Tue</div><div class="dc-num">29</div></div>
-        <div class="dc" onclick="pickDate(this)"><div class="dc-day">Wed</div><div class="dc-num">30</div></div>
-        <div class="dc" onclick="pickDate(this)"><div class="dc-day">Thu</div><div class="dc-num">1</div></div>
-        <div class="dc" onclick="pickDate(this)"><div class="dc-day">Fri</div><div class="dc-num">2</div></div>
+      <div class="cat" style="margin-top:0">Select a date</div>
+      <div class="month-nav">
+        <button class="month-btn" onclick="prevMonth()">‹</button>
+        <div class="month-label" id="month-label"></div>
+        <button class="month-btn" onclick="nextMonth()">›</button>
+      </div>
+      <div class="cal-grid" id="cal-grid">
+        <div class="cal-day-label">Su</div><div class="cal-day-label">Mo</div><div class="cal-day-label">Tu</div>
+        <div class="cal-day-label">We</div><div class="cal-day-label">Th</div><div class="cal-day-label">Fr</div><div class="cal-day-label">Sa</div>
       </div>
       <div class="cat">Available times</div>
-      <div class="time-grid">
-        <div class="t-btn full">9:00 am</div>
-        <div class="t-btn" onclick="pickTime(this)">10:00 am</div>
-        <div class="t-btn" onclick="pickTime(this)">10:30 am</div>
-        <div class="t-btn sel" onclick="pickTime(this)">11:30 am</div>
-        <div class="t-btn full">12:00 pm</div>
-        <div class="t-btn" onclick="pickTime(this)">1:00 pm</div>
-        <div class="t-btn" onclick="pickTime(this)">2:30 pm</div>
-        <div class="t-btn" onclick="pickTime(this)">3:00 pm</div>
-        <div class="t-btn full">4:30 pm</div>
-      </div>
-      <p style="font-size:11px;color:var(--text3)">Strikethrough = fully booked. Times shown in your local timezone.</p>
+      <div class="time-grid" id="time-grid"></div>
+      <p style="font-size:11px;color:var(--text3)">Strikethrough = fully booked.</p>
     </div>
     <div class="ftr">
       <button class="bk" onclick="goTo('s-inspo')">← Back</button>
@@ -602,38 +249,34 @@
     </div>
   </div>
 
-  <!-- ===== SCREEN: CONTACT & SUBSCRIBE ===== -->
+  <!-- CONTACT -->
   <div class="screen" id="s-contact">
-    <div class="hdr">
-      <div class="brand">Nails by <em>Minh</em></div>
-      <div class="tagline">Your info & subscribe</div>
-    </div>
+    <div class="hdr"><div class="brand">Nails by <em>Minh</em></div><div class="tagline">Your info</div></div>
     <div class="body">
-      <label class="lbl">Your name</label>
-      <input class="inp" type="text" placeholder="First name" id="inp-name">
-      <label class="lbl">Phone number</label>
-      <input class="inp" type="tel" placeholder="(408) 000-0000" id="inp-phone">
-      <label class="lbl">Email (optional)</label>
-      <input class="inp" type="email" placeholder="you@email.com">
-
+      <label class="lbl">Your name *</label>
+      <input class="inp" type="text" id="inp-name" placeholder="First name">
+      <label class="lbl">Phone number *</label>
+      <input class="inp" type="tel" id="inp-phone" placeholder="(408) 000-0000">
+      <label class="lbl">Email (get confirmation email)</label>
+      <input class="inp" type="email" id="inp-email" placeholder="you@email.com">
       <div class="tog-box">
         <div class="tog-title">Subscribe for deals & openings</div>
-        <div class="tog-sub">Get promos, last-minute slots & loyalty rewards from Minh sent straight to your phone or email.</div>
-        <div class="tog-row">Text alerts <div class="tog on" onclick="this.classList.toggle('on')"></div></div>
-        <div class="tog-row" style="margin-top:8px">Email updates <div class="tog" onclick="this.classList.toggle('on')"></div></div>
+        <div class="tog-sub">Get promos, last-minute slots & loyalty rewards from Minh.</div>
+        <div class="tog-row">Text alerts <div class="tog on" id="tog-text" onclick="this.classList.toggle('on')"></div></div>
+        <div class="tog-row" style="margin-top:8px">Email updates <div class="tog" id="tog-email" onclick="this.classList.toggle('on')"></div></div>
       </div>
-
       <div class="sum-box">
-        <div class="sum-box-title">Order summary</div>
+        <div class="sum-box-title">Your booking summary</div>
         <div class="sum-row"><span class="sum-lbl">Service</span><span id="sum-svc">—</span></div>
         <div class="sum-row"><span class="sum-lbl">Add-ons</span><span id="sum-add">—</span></div>
+        <div class="sum-row"><span class="sum-lbl">Style / Inspo</span><span id="sum-inspo">—</span></div>
         <div class="sum-row"><span class="sum-lbl">Date & time</span><span id="sum-dt">—</span></div>
         <div class="sum-row"><span class="sum-lbl">Station</span><span>Minh · Station 7</span></div>
-        <div class="sum-row"><span class="sum-lbl">Est. total</span><span style="color:var(--gold)">Confirmed at appt.</span></div>
       </div>
+      <div class="error-msg" id="err-msg"></div>
     </div>
     <div class="btn-wrap">
-      <button class="btn" onclick="confirmBooking()">Confirm booking →</button>
+      <button class="btn" id="confirm-btn" onclick="submitBooking()">Confirm my booking →</button>
     </div>
     <div class="ftr" style="border-top:none;padding-top:0">
       <button class="bk" onclick="goTo('s-datetime')">← Back</button>
@@ -642,100 +285,267 @@
     </div>
   </div>
 
-  <!-- ===== SCREEN: CONFIRMATION ===== -->
+  <!-- CONFIRMATION -->
   <div class="screen" id="s-confirm">
-    <div class="hdr">
-      <div class="brand">Nails by <em>Minh</em></div>
-      <div class="tagline">You're all set ✓</div>
-    </div>
+    <div class="hdr"><div class="brand">Nails by <em>Minh</em></div><div class="tagline">You're all set ✓</div></div>
     <div class="body" style="display:flex;flex-direction:column;align-items:center;padding-top:2rem">
       <div class="confirm-ring">✓</div>
       <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;color:var(--text);text-align:center;margin-bottom:6px">Booking confirmed!</div>
-      <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:1.5rem;line-height:1.5">A confirmation text is on its way.<br>Can't wait to see you! 💅</div>
+      <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:1.5rem;line-height:1.6">A confirmation has been sent.<br>Can't wait to see you! 💅</div>
       <div style="border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;width:100%;margin-bottom:1rem">
         <div class="sum-row"><span class="sum-lbl">Service</span><span id="conf-svc">—</span></div>
         <div class="sum-row"><span class="sum-lbl">Add-ons</span><span id="conf-add">—</span></div>
         <div class="sum-row"><span class="sum-lbl">Date & time</span><span id="conf-dt">—</span></div>
         <div class="sum-row"><span class="sum-lbl">Station</span><span>Minh · Station 7</span></div>
       </div>
-      <p style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:1.5rem;line-height:1.5">Need to cancel? Reply CANCEL to your confirmation text at least 24 hrs before your appointment.</p>
-      <button class="btn" onclick="goTo('s-home')">Book another appointment</button>
+      <p style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:1.5rem;line-height:1.5">Need to cancel? Text (408) 831-0316 at least 24 hours before.</p>
+      <button class="btn" onclick="resetApp()">Book another appointment</button>
     </div>
   </div>
 
 </div>
 
 <script>
-  // State
-  let selSvc = '', selAddons = [], selDate = 'Fri Apr 25', selTime = '11:30 am';
+  // ── State ─────────────────────────────────────────────────────────────
+  let selSvc = '', selAddons = [], selInspo = 'Chrome silver';
+  let selDate = '', selTime = '', blockedTimes = [];
+  let curYear, curMonth;
+  const ALL_TIMES = ['9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM','11:30 AM','12:00 PM','12:30 PM','1:00 PM','1:30 PM','2:00 PM','2:30 PM','3:00 PM','3:30 PM','4:00 PM','4:30 PM'];
+  // Days off: 0=Sun, 1=Mon (adjust as needed — currently closed Sunday & Monday)
+  const DAYS_OFF = [0, 1];
 
+  // ── Navigation ─────────────────────────────────────────────────────────
   function goTo(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
     document.getElementById(id).classList.add('on');
     window.scrollTo(0, 0);
+    if (id === 's-contact') fillSummary();
   }
 
   function switchTab(tab) {
     ['book','ask','deals'].forEach(t => {
-      document.getElementById('tab-'+t+'-body').style.display = t === tab ? 'block' : 'none';
+      const body = document.getElementById('tab-'+t+'-body');
+      if (body) body.style.display = t === tab ? 'block' : 'none';
       document.getElementById('tab-'+t).classList.toggle('act', t === tab);
     });
     document.getElementById('home-btn-wrap').style.display = tab === 'book' ? 'block' : 'none';
   }
 
+  // ── Service selection ──────────────────────────────────────────────────
   function pick(el, name, price) {
     document.querySelectorAll('.svc').forEach(r => r.classList.remove('sel'));
     el.classList.add('sel');
     selSvc = name + ' · ' + price;
   }
-
   function toggleAddon(el, name) {
     el.classList.toggle('sel');
-    if (el.classList.contains('sel')) {
-      if (!selAddons.includes(name)) selAddons.push(name);
-    } else {
-      selAddons = selAddons.filter(a => a !== name);
+    selAddons = el.classList.contains('sel')
+      ? [...selAddons.filter(a => a !== name), name]
+      : selAddons.filter(a => a !== name);
+  }
+
+  // ── Inspo ──────────────────────────────────────────────────────────────
+  function pickArt(el, name) {
+    document.querySelectorAll('.art-card').forEach(c => c.classList.remove('sel'));
+    el.classList.add('sel');
+    selInspo = name;
+  }
+  function triggerUpload() { document.getElementById('file-input').click(); }
+  function handleUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const preview = document.getElementById('upload-preview');
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = 'block';
+    document.querySelectorAll('.art-card').forEach(c => c.classList.remove('sel'));
+    selInspo = 'Custom upload: ' + file.name;
+  }
+
+  // ── Calendar ───────────────────────────────────────────────────────────
+  function initCalendar() {
+    const now = new Date();
+    curYear = now.getFullYear();
+    curMonth = now.getMonth();
+    renderCalendar();
+    renderTimes();
+  }
+  function prevMonth() { curMonth--; if (curMonth < 0) { curMonth = 11; curYear--; } renderCalendar(); }
+  function nextMonth() { curMonth++; if (curMonth > 11) { curMonth = 0; curYear++; } renderCalendar(); }
+
+  function renderCalendar() {
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('month-label').textContent = months[curMonth] + ' ' + curYear;
+    const grid = document.getElementById('cal-grid');
+    // Remove existing day buttons (keep labels)
+    while (grid.children.length > 7) grid.removeChild(grid.lastChild);
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const firstDay = new Date(curYear, curMonth, 1).getDay();
+    const daysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+      const blank = document.createElement('div');
+      grid.appendChild(blank);
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+      const btn = document.createElement('button');
+      btn.className = 'cal-day';
+      btn.textContent = d;
+      const date = new Date(curYear, curMonth, d);
+      const isPast = date < today;
+      const isOff = DAYS_OFF.includes(date.getDay());
+      if (isPast) btn.classList.add('past');
+      else if (isOff) btn.classList.add('off');
+      else {
+        const ds = dateStr(curYear, curMonth, d);
+        btn.onclick = () => pickDate(btn, ds, d);
+        if (selDate === dateStr(curYear, curMonth, d)) btn.classList.add('sel');
+      }
+      grid.appendChild(btn);
     }
   }
 
-  function pickArt(el) {
-    document.querySelectorAll('.art-card').forEach(c => c.classList.remove('sel'));
-    el.classList.add('sel');
+  function dateStr(y, m, d) {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${months[m]} ${d}, ${y}`;
   }
 
-  function triggerUpload() {
-    document.getElementById('file-input').click();
+  async function pickDate(btn, ds, d) {
+    selDate = ds;
+    selTime = '';
+    document.querySelectorAll('.cal-day').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    // Fetch blocked slots for this date
+    try {
+      const r = await fetch('/api/slots?date=' + encodeURIComponent(ds));
+      const data = await r.json();
+      blockedTimes = data.blocked || [];
+    } catch(e) { blockedTimes = []; }
+    renderTimes();
   }
 
-  function handleUpload(e) {
-    const file = e.target.files[0];
-    if (file) alert('Photo "' + file.name + '" added! Minh will see it with your booking.');
+  function renderTimes() {
+    const grid = document.getElementById('time-grid');
+    grid.innerHTML = '';
+    ALL_TIMES.forEach(t => {
+      const btn = document.createElement('div');
+      btn.className = 't-btn';
+      btn.textContent = t;
+      const isBlocked = blockedTimes.includes(t);
+      if (isBlocked) {
+        btn.classList.add('full');
+      } else {
+        btn.onclick = () => {
+          document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('sel'));
+          btn.classList.add('sel');
+          selTime = t;
+        };
+        if (selTime === t) btn.classList.add('sel');
+      }
+      grid.appendChild(btn);
+    });
   }
 
-  function pickDate(el) {
-    document.querySelectorAll('.dc').forEach(c => c.classList.remove('sel'));
-    el.classList.add('sel');
-    selDate = el.querySelector('.dc-day').textContent + ' Apr ' + el.querySelector('.dc-num').textContent;
-  }
-
-  function pickTime(el) {
-    if (el.classList.contains('full')) return;
-    document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('sel'));
-    el.classList.add('sel');
-    selTime = el.textContent.trim();
-  }
-
-  function confirmBooking() {
-    const dt = selDate + ' · ' + selTime;
-    const addText = selAddons.length ? selAddons.join(', ') : 'None';
+  // ── Summary ────────────────────────────────────────────────────────────
+  function fillSummary() {
     document.getElementById('sum-svc').textContent = selSvc || '—';
-    document.getElementById('sum-add').textContent = addText;
-    document.getElementById('sum-dt').textContent = dt;
-    document.getElementById('conf-svc').textContent = selSvc || '—';
-    document.getElementById('conf-add').textContent = addText;
-    document.getElementById('conf-dt').textContent = dt;
-    goTo('s-confirm');
+    document.getElementById('sum-add').textContent = selAddons.length ? selAddons.join(', ') : 'None';
+    document.getElementById('sum-inspo').textContent = selInspo || '—';
+    document.getElementById('sum-dt').textContent = (selDate && selTime) ? selDate + ' · ' + selTime : '—';
   }
+
+  // ── Submit booking ─────────────────────────────────────────────────────
+  async function submitBooking() {
+    const name  = document.getElementById('inp-name').value.trim();
+    const phone = document.getElementById('inp-phone').value.trim();
+    const email = document.getElementById('inp-email').value.trim();
+    const notes = document.getElementById('inspo-notes').value.trim();
+    const subText  = document.getElementById('tog-text').classList.contains('on');
+    const subEmail = document.getElementById('tog-email').classList.contains('on');
+    const errEl = document.getElementById('err-msg');
+    errEl.style.display = 'none';
+
+    if (!selSvc)   return showErr('Please select a service first.');
+    if (!selDate)  return showErr('Please pick a date.');
+    if (!selTime)  return showErr('Please pick a time slot.');
+    if (!name)     return showErr('Please enter your name.');
+    if (!phone)    return showErr('Please enter your phone number.');
+
+    const btn = document.getElementById('confirm-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Booking...';
+
+    try {
+      const res = await fetch('/api/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: name, clientPhone: phone, clientEmail: email || null,
+          service: selSvc,
+          addons: selAddons.length ? selAddons.join(', ') : null,
+          inspoStyle: selInspo || null,
+          notes: notes || null,
+          bookingDate: selDate, bookingTime: selTime,
+          subscribeText: subText, subscribeEmail: subEmail
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (data.error === 'SLOT_TAKEN') {
+          showErr('That time slot was just taken! Please go back and pick another time.');
+          blockedTimes.push(selTime);
+          selTime = '';
+          renderTimes();
+        } else {
+          showErr(data.error || 'Something went wrong. Please try again.');
+        }
+        btn.disabled = false;
+        btn.innerHTML = 'Confirm my booking →';
+        return;
+      }
+      // Success!
+      document.getElementById('conf-svc').textContent = selSvc;
+      document.getElementById('conf-add').textContent = selAddons.length ? selAddons.join(', ') : 'None';
+      document.getElementById('conf-dt').textContent = selDate + ' · ' + selTime;
+      goTo('s-confirm');
+    } catch (err) {
+      showErr('Network error. Please check your connection and try again.');
+      btn.disabled = false;
+      btn.innerHTML = 'Confirm my booking →';
+    }
+  }
+
+  function showErr(msg) {
+    const el = document.getElementById('err-msg');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  // ── Ask / Subscribe ────────────────────────────────────────────────────
+  function fillQ(el) { document.getElementById('ask-question').value = el.textContent; }
+  function sendQuestion() { alert('Message sent! Minh will reply to your number shortly.'); }
+  function subscribeDeal() { alert('You\'re subscribed! Watch for deals from Minh. 💅'); }
+
+  // ── Reset ──────────────────────────────────────────────────────────────
+  function resetApp() {
+    selSvc = ''; selAddons = []; selInspo = 'Chrome silver';
+    selDate = ''; selTime = ''; blockedTimes = [];
+    document.querySelectorAll('.svc').forEach(r => r.classList.remove('sel'));
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('sel'));
+    document.getElementById('inp-name').value = '';
+    document.getElementById('inp-phone').value = '';
+    document.getElementById('inp-email').value = '';
+    document.getElementById('inspo-notes').value = '';
+    document.getElementById('confirm-btn').disabled = false;
+    document.getElementById('confirm-btn').innerHTML = 'Confirm my booking →';
+    renderCalendar();
+    renderTimes();
+    goTo('s-home');
+    switchTab('book');
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────────
+  initCalendar();
 </script>
 </body>
 </html>
