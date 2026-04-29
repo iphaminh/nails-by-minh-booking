@@ -159,7 +159,29 @@ export default async function handler(req, res) {
       })
     });
 
-    // ── 7. Return success ──────────────────────────────────────────────
+    // ── 7. Text MINH via Twilio ────────────────────────────────────────
+    const TWILIO_SID   = process.env.TWILIO_SID;
+    const TWILIO_TOKEN = process.env.TWILIO_TOKEN;
+    const TWILIO_FROM  = process.env.TWILIO_FROM;
+    const TWILIO_TO    = process.env.TWILIO_TO;
+
+    if (TWILIO_SID && TWILIO_TOKEN && TWILIO_FROM && TWILIO_TO) {
+      const smsBody = `💅 New booking!\n${clientName}\n${service}\n${bookingDate} at ${bookingTime}\n📞 ${clientPhone}${notes ? `\n📝 ${notes}` : ''}`;
+      await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
+        method: 'POST',
+        headers: {
+          Authorization: 'Basic ' + Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64'),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          From: TWILIO_FROM,
+          To: TWILIO_TO,
+          Body: smsBody
+        })
+      });
+    }
+
+    // ── 8. Return success ──────────────────────────────────────────────
     return res.status(200).json({
       success: true,
       bookingId: booking.id,
