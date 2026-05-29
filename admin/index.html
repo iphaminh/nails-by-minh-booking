@@ -44,6 +44,8 @@
     .booking-row:last-child{border-bottom:none}
     .booking-row:hover{background:var(--bg)}
     .bk-name{font-size:14px;font-weight:500;color:var(--text)}
+    .loyalty-flag{display:inline-block;font-size:11px;font-weight:600;color:#7a5a1e;background:#f5e6c8;border:0.5px solid #d8b878;padding:2px 8px;border-radius:10px;margin:3px 0}
+    .visit-count{font-size:10px;color:var(--text3);margin:2px 0}
     .bk-service{font-size:12px;color:var(--text2);margin-top:2px}
     .bk-addons{font-size:11px;color:var(--text3);margin-top:1px}
     .bk-dt{font-size:13px;color:var(--text);font-weight:500}
@@ -115,6 +117,10 @@
   let adminKey = '';
   let allBookings = [];
   let activeFilter = 'all';
+  let loyaltyCounts = {};
+
+  // Normalize phone to digits only (matches the loyalty API)
+  function phoneKey(p){ return p ? String(p).replace(/\D/g,'') : ''; }
   const today = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
   function login() {
@@ -142,6 +148,12 @@
       }
       const data = await r.json();
       allBookings = data.bookings || [];
+      // Also load loyalty visit counts (completed visits per phone)
+      try {
+        const lr = await fetch('/api/admin/loyalty', { headers: { 'x-admin-key': adminKey } });
+        const ld = await lr.json();
+        loyaltyCounts = ld.counts || {};
+      } catch(e) { loyaltyCounts = {}; }
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('dashboard').style.display = 'block';
       document.getElementById('login-err').style.display = 'none';
@@ -175,10 +187,20 @@
       list.innerHTML = '<div class="empty">No bookings found.</div>';
       return;
     }
-    list.innerHTML = filtered.map(b => `
+    list.innerHTML = filtered.map(b => {
+      const completed = loyaltyCounts[phoneKey(b.client_phone)] || 0;
+      // Their upcoming/this visit number = completed visits + 1
+      const visitNum = completed + 1;
+      const isRewardVisit = visitNum % 5 === 0;  // every 5th visit
+      const toReward = (5 - (visitNum % 5)) % 5;  // visits remaining until next reward
+      const loyaltyHtml = isRewardVisit
+        ? `<div class="loyalty-flag">⭐ Visit #${visitNum} — give $10 off!</div>`
+        : `<div class="visit-count">Visit #${visitNum} · ${toReward} more to $10 off</div>`;
+      return `
       <div class="booking-row" id="row-${b.id}">
         <div>
           <div class="bk-name">${b.client_name}</div>
+          ${loyaltyHtml}
           <div class="bk-service">${b.service}</div>
           ${b.addons ? `<div class="bk-addons">+ ${b.addons}</div>` : ''}
           ${b.inspo_style ? `<div class="bk-inspo">💅 ${b.inspo_style}</div>` : ''}
@@ -198,7 +220,7 @@
           ${b.status !== 'cancelled' && b.status !== 'completed' ? `<button class="act-btn" onclick="updateStatus('${b.id}','cancelled')">Cancel</button>` : ''}
         </div>
       </div>
-    `).join('');
+    `;}).join('');
   }
 
   async function updateStatus(id, status) {
