@@ -69,6 +69,24 @@
       .booking-row{grid-template-columns:1fr;gap:8px}
       .action-btns{flex-direction:row;flex-wrap:wrap}
     }
+    .text-btn{border-color:#c9a87c !important;color:#7a5a1e !important;font-weight:500}
+    .text-btn:hover{background:#faf3e6 !important}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;align-items:center;justify-content:center;padding:20px}
+    .modal-box{background:#fff;border-radius:14px;width:100%;max-width:440px;padding:22px;box-shadow:0 12px 50px rgba(0,0,0,0.25);max-height:90vh;overflow-y:auto}
+    .modal-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--text)}
+    .modal-sub{font-size:13px;color:var(--text2);margin-top:2px;margin-bottom:14px}
+    .tmpl-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+    .tmpl-wrap{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+    .tmpl-btn{text-align:left;font-size:12px;line-height:1.4;color:var(--text);background:var(--bg2);border:0.5px solid var(--border);border-radius:8px;padding:8px 10px;cursor:pointer;font-family:'Jost',sans-serif;transition:all 0.15s}
+    .tmpl-btn:hover{border-color:#c9a87c;background:#faf3e6}
+    .modal-textarea{width:100%;height:90px;resize:none;border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-family:'Jost',sans-serif;color:var(--text);outline:none}
+    .modal-textarea:focus{border-color:#c9a87c}
+    .modal-status{font-size:12px;min-height:16px;margin:8px 0}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+    .modal-cancel{font-size:12px;padding:9px 16px;border-radius:8px;border:0.5px solid var(--border);background:#fff;color:var(--text2);cursor:pointer;font-family:'Jost',sans-serif}
+    .modal-send{font-size:12px;padding:9px 18px;border-radius:8px;border:none;background:#111;color:#f5f0ea;cursor:pointer;font-family:'Jost',sans-serif;font-weight:500}
+    .modal-send:disabled{opacity:0.5;cursor:not-allowed}
+    .modal-foot{font-size:10px;color:var(--text3);text-align:center;margin-top:12px}
   </style>
 </head>
 <body>
@@ -118,10 +136,10 @@
   let allBookings = [];
   let activeFilter = 'all';
   let loyaltyCounts = {};
+  const today = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
   // Normalize phone to digits only (matches the loyalty API)
   function phoneKey(p){ return p ? String(p).replace(/\D/g,'') : ''; }
-  const today = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
   function login() {
     const pw = document.getElementById('pw-input').value;
@@ -148,7 +166,6 @@
       }
       const data = await r.json();
       allBookings = data.bookings || [];
-      // Also load loyalty visit counts (completed visits per phone)
       try {
         const lr = await fetch('/api/admin/loyalty', { headers: { 'x-admin-key': adminKey } });
         const ld = await lr.json();
@@ -189,13 +206,13 @@
     }
     list.innerHTML = filtered.map(b => {
       const completed = loyaltyCounts[phoneKey(b.client_phone)] || 0;
-      // Their upcoming/this visit number = completed visits + 1
       const visitNum = completed + 1;
-      const isRewardVisit = visitNum % 5 === 0;  // every 5th visit
-      const toReward = (5 - (visitNum % 5)) % 5;  // visits remaining until next reward
+      const isRewardVisit = visitNum % 5 === 0;
+      const toReward = (5 - (visitNum % 5)) % 5;
       const loyaltyHtml = isRewardVisit
         ? `<div class="loyalty-flag">⭐ Visit #${visitNum} — give $10 off!</div>`
         : `<div class="visit-count">Visit #${visitNum} · ${toReward} more to $10 off</div>`;
+      const safeName = (b.client_name || '').replace(/'/g, "\\'");
       return `
       <div class="booking-row" id="row-${b.id}">
         <div>
@@ -215,6 +232,7 @@
           <div style="font-size:10px;color:var(--text3);margin-top:4px">${new Date(b.created_at).toLocaleDateString()}</div>
         </div>
         <div class="action-btns">
+          <button class="act-btn text-btn" onclick="openText('${b.client_phone}','${safeName}','${b.booking_date}','${b.booking_time}')">💬 Text</button>
           ${b.status === 'pending' ? `<button class="act-btn confirm" onclick="updateStatus('${b.id}','confirmed')">Confirm</button>` : ''}
           ${b.status === 'confirmed' ? `<button class="act-btn" onclick="updateStatus('${b.id}','completed')">Done ✓</button>` : ''}
           ${b.status !== 'cancelled' && b.status !== 'completed' ? `<button class="act-btn" onclick="updateStatus('${b.id}','cancelled')">Cancel</button>` : ''}
@@ -236,8 +254,89 @@
     } catch(e) { alert('Error updating booking. Try again.'); }
   }
 
+  // ---- Texting a client ----
+  let textTo = '';
+
+  function openText(phone, name, date, time) {
+    textTo = phone;
+    document.getElementById('text-to-name').textContent = name + ' · ' + phone;
+    const firstName = (name || '').split(' ')[0] || 'there';
+
+    // Quick templates (tap to fill, still editable after)
+    const templates = [
+      `Hi ${firstName}! This is Minh confirming your appointment on ${date} at ${time}. See you then! 💅`,
+      `Hi ${firstName}, just a reminder of your nail appointment on ${date} at ${time}. Reply here if you need to change anything.`,
+      `Hi ${firstName}, I'm running a few minutes behind today. Thank you for your patience! 🙏`,
+      `Hi ${firstName}, are you still able to make your appointment on ${date} at ${time}? Let me know. Thanks!`
+    ];
+    const tWrap = document.getElementById('text-templates');
+    tWrap.innerHTML = templates.map(t =>
+      `<button class="tmpl-btn" onclick="fillText(this)">${t}</button>`
+    ).join('');
+
+    document.getElementById('text-body').value = '';
+    document.getElementById('text-status').textContent = '';
+    document.getElementById('text-modal').style.display = 'flex';
+  }
+
+  function fillText(btn) {
+    document.getElementById('text-body').value = btn.textContent;
+    document.getElementById('text-body').focus();
+  }
+
+  function closeText() {
+    document.getElementById('text-modal').style.display = 'none';
+    textTo = '';
+  }
+
+  async function sendText() {
+    const body = document.getElementById('text-body').value.trim();
+    const statusEl = document.getElementById('text-status');
+    if (!body) { statusEl.style.color = '#c0392b'; statusEl.textContent = 'Type a message first.'; return; }
+    const sendBtn = document.getElementById('text-send-btn');
+    sendBtn.disabled = true;
+    statusEl.style.color = 'var(--text2)';
+    statusEl.textContent = 'Sending…';
+    try {
+      const r = await fetch('/api/admin/reply', {
+        method: 'POST',
+        headers: { 'x-admin-key': adminKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: textTo, message: body })
+      });
+      const data = await r.json();
+      if (!r.ok) {
+        statusEl.style.color = '#c0392b';
+        statusEl.textContent = data.error || 'Failed to send.';
+      } else {
+        statusEl.style.color = '#1e7a3e';
+        statusEl.textContent = '✓ Sent!';
+        setTimeout(closeText, 900);
+      }
+    } catch(e) {
+      statusEl.style.color = '#c0392b';
+      statusEl.textContent = 'Connection error. Try again.';
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+
   // Auto-refresh every 60 seconds
   setInterval(() => { if (adminKey) loadBookings(); }, 60000);
 </script>
+<div id="text-modal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-title">Text client</div>
+    <div id="text-to-name" class="modal-sub"></div>
+    <div class="tmpl-label">Quick replies — tap one, then edit if needed</div>
+    <div id="text-templates" class="tmpl-wrap"></div>
+    <textarea id="text-body" class="modal-textarea" placeholder="Or type your own message…"></textarea>
+    <div id="text-status" class="modal-status"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeText()">Cancel</button>
+      <button id="text-send-btn" class="modal-send" onclick="sendText()">Send text →</button>
+    </div>
+    <div class="modal-foot">Sent from your business number · clients can reply by text</div>
+  </div>
+</div>
 </body>
 </html>
