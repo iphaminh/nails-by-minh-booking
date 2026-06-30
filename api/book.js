@@ -10,7 +10,8 @@ export default async function handler(req, res) {
     clientName, clientPhone, clientEmail,
     service, addons, inspoStyle, notes,
     bookingDate, bookingTime,
-    subscribeText, subscribeEmail
+    subscribeText, subscribeEmail,
+    photoData, photoName
   } = req.body;
 
   // Basic validation
@@ -36,6 +37,43 @@ export default async function handler(req, res) {
       return res.status(409).json({ error: 'SLOT_TAKEN', message: 'Sorry, that time was just booked! Please pick another.' });
     }
 
+    // ── 1b. Upload inspo photo to Supabase Storage (if provided) ───────
+    let photoUrl = null, photoPath = null;
+    if (photoData && typeof photoData === 'string' && photoData.startsWith('data:image')) {
+      try {
+        const match = photoData.match(/^data:(image\/\w+);base64,(.+)$/);
+        if (match) {
+          const contentType = match[1];
+          const bytes = Buffer.from(match[2], 'base64');
+          const ext = contentType.split('/')[1] || 'jpg';
+          // unique path: date/phone-timestamp.ext
+          const safePhone = String(clientPhone).replace(/\D/g, '');
+          photoPath = `${bookingDate}/${safePhone}-${Date.now()}.${ext}`;
+          const upRes = await fetch(
+            `${SUPABASE_URL}/storage/v1/object/inspo-photos/${photoPath}`,
+            {
+              method: 'POST',
+              headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': contentType,
+                'x-upsert': 'true'
+              },
+              body: bytes
+            }
+          );
+          if (upRes.ok) {
+            photoUrl = `${SUPABASE_URL}/storage/v1/object/public/inspo-photos/${photoPath}`;
+          } else {
+            console.error('Photo upload failed:', await upRes.text());
+          }
+        }
+      } catch (e) {
+        console.error('Photo upload error:', e);
+        // Don't fail the whole booking just because the photo failed
+      }
+    }
+
     // ── 2. Save booking to Supabase ────────────────────────────────────
     const bookingRes = await fetch(`${SUPABASE_URL}/rest/v1/bookings`, {
       method: 'POST',
@@ -57,7 +95,9 @@ export default async function handler(req, res) {
         booking_time: bookingTime,
         status: 'pending',
         subscribe_text: subscribeText || false,
-        subscribe_email: subscribeEmail || false
+        subscribe_email: subscribeEmail || false,
+        photo_url: photoUrl,
+        photo_path: photoPath
       })
     });
     const [booking] = await bookingRes.json();
@@ -167,17 +207,24 @@ export default async function handler(req, res) {
 
     if (TWILIO_SID && TWILIO_TOKEN && TWILIO_FROM && TWILIO_TO) {
       const smsBody = `💅 New booking!\n${clientName}\n${service}\n${bookingDate} at ${bookingTime}\n📞 ${clientPhone}${notes ? `\n📝 ${notes}` : ''}`;
+      const params = {
+        From: TWILIO_FROM,
+        To: TWILIO_TO,
+        Body: smsBody
+      };
+      // Attach the inspo photo as MMS — unless you turn it off.
+      // Set MMS_PHOTOS=off in Vercel to pause photo texting anytime.
+      const mmsOn = (process.env.MMS_PHOTOS || 'on').toLowerCase() !== 'off';
+      if (photoUrl && mmsOn) {
+        params.MediaUrl = photoUrl;
+      }
       await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
         method: 'POST',
         headers: {
           Authorization: 'Basic ' + Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64'),
           'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: new URLSearchParams({
-          From: TWILIO_FROM,
-          To: TWILIO_TO,
-          Body: smsBody
-        })
+        body: new URLSearchParams(params)
       });
     }
 
