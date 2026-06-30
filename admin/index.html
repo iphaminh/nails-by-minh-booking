@@ -52,6 +52,8 @@
     .bk-phone{font-size:12px;color:var(--text2);margin-top:2px}
     .bk-inspo{font-size:11px;color:var(--gold);margin-top:2px}
     .bk-notes{font-size:11px;color:var(--text3);margin-top:4px;padding:6px 8px;background:var(--bg);border-radius:6px;line-height:1.4}
+    .bk-photo{margin-top:8px;width:120px;height:120px;object-fit:cover;border-radius:8px;border:0.5px solid var(--border);cursor:pointer;display:block}
+    .bk-photo:hover{opacity:0.85}
     .status-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;letter-spacing:0.5px;text-transform:uppercase;font-weight:500}
     .status-pending{background:#fef9ec;color:#b45309}
     .status-confirmed{background:#f0fdf4;color:#166534}
@@ -171,6 +173,8 @@
         const ld = await lr.json();
         loyaltyCounts = ld.counts || {};
       } catch(e) { loyaltyCounts = {}; }
+      // Quietly clean up inspo photos older than a week (privacy + storage)
+      fetch('/api/admin/cleanup-photos', { headers: { 'x-admin-key': adminKey } }).catch(()=>{});
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('dashboard').style.display = 'block';
       document.getElementById('login-err').style.display = 'none';
@@ -222,6 +226,7 @@
           ${b.addons ? `<div class="bk-addons">+ ${b.addons}</div>` : ''}
           ${b.inspo_style ? `<div class="bk-inspo">💅 ${b.inspo_style}</div>` : ''}
           ${b.notes ? `<div class="bk-notes">📝 ${b.notes}</div>` : ''}
+          ${b.photo_url ? `<a href="${b.photo_url}" target="_blank" rel="noopener"><img src="${b.photo_url}" class="bk-photo" alt="Client inspo photo"></a>` : ''}
         </div>
         <div>
           <div class="bk-dt">${b.booking_date}</div>
