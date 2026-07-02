@@ -39,6 +39,7 @@ export default async function handler(req, res) {
 
     // ── 1b. Upload inspo photo to Supabase Storage (if provided) ───────
     let photoUrl = null, photoPath = null;
+    console.log('Photo check — received photoData?', photoData ? `yes (${photoData.length} chars)` : 'no');
     if (photoData && typeof photoData === 'string' && photoData.startsWith('data:image')) {
       try {
         const match = photoData.match(/^data:(image\/\w+);base64,(.+)$/);
@@ -64,9 +65,12 @@ export default async function handler(req, res) {
           );
           if (upRes.ok) {
             photoUrl = `${SUPABASE_URL}/storage/v1/object/public/inspo-photos/${photoPath}`;
+            console.log('Photo uploaded OK:', photoUrl);
           } else {
-            console.error('Photo upload failed:', await upRes.text());
+            console.error('Photo upload failed:', upRes.status, await upRes.text());
           }
+        } else {
+          console.error('Photo data did not match expected data:image;base64 format');
         }
       } catch (e) {
         console.error('Photo upload error:', e);
