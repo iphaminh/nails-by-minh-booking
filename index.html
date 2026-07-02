@@ -356,7 +356,8 @@
     selInspo = name;
   }
   function triggerUpload() { document.getElementById('file-input').click(); }
-  let uploadedPhoto = null; // { dataUrl, name } — compressed, sent with booking
+  let uploadedPhoto = null;      // { dataUrl, name } — compressed, sent with booking
+  let photoProcessing = null;    // a Promise that resolves when compression is done
   function handleUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -366,21 +367,42 @@
     document.querySelectorAll('.art-card').forEach(c => c.classList.remove('sel'));
     selInspo = 'Custom upload: ' + file.name;
 
-    // Compress to keep upload small + fast (max ~1000px, JPEG)
-    const img = new Image();
-    img.onload = function() {
-      const maxDim = 1000;
-      let w = img.width, h = img.height;
-      if (w > maxDim || h > maxDim) {
-        if (w >= h) { h = Math.round(h * maxDim / w); w = maxDim; }
-        else { w = Math.round(w * maxDim / h); h = maxDim; }
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      uploadedPhoto = { dataUrl: canvas.toDataURL('image/jpeg', 0.8), name: file.name };
-    };
-    img.src = URL.createObjectURL(file);
+    // Compress to keep upload small + fast (max ~1000px, JPEG).
+    // Wrap in a Promise so submitBooking can WAIT for it to finish —
+    // otherwise a fast tap on Confirm could send before the photo is ready.
+    uploadedPhoto = null;
+    photoProcessing = new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = function() {
+        const img = new Image();
+        img.onload = function() {
+          try {
+            const maxDim = 1000;
+            let w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w >= h) { h = Math.round(h * maxDim / w); w = maxDim; }
+              else { w = Math.round(w * maxDim / h); h = maxDim; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            uploadedPhoto = { dataUrl: canvas.toDataURL('image/jpeg', 0.85), name: file.name };
+          } catch (err) {
+            // If canvas fails for any reason, fall back to the raw file data
+            uploadedPhoto = { dataUrl: reader.result, name: file.name };
+          }
+          resolve();
+        };
+        img.onerror = function() {
+          // If the image can't decode for canvas, still send the raw data
+          uploadedPhoto = { dataUrl: reader.result, name: file.name };
+          resolve();
+        };
+        img.src = reader.result;
+      };
+      reader.onerror = function() { resolve(); };
+      reader.readAsDataURL(file); // base64 data URL — reliable across browsers
+    });
   }
 
   // ── Calendar ───────────────────────────────────────────────────────────
@@ -498,6 +520,11 @@
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>Booking...';
 
+    // If a photo is still compressing, wait for it so it isn't skipped
+    if (photoProcessing) {
+      try { await photoProcessing; } catch (e) {}
+    }
+
     try {
       const res = await fetch('/api/book', {
         method: 'POST',
@@ -563,6 +590,7 @@
     document.getElementById('inspo-notes').value = '';
     document.getElementById('inp-referrer').value = '';
     uploadedPhoto = null;
+    photoProcessing = null;
     document.getElementById('confirm-btn').disabled = false;
     document.getElementById('confirm-btn').innerHTML = 'Confirm my booking →';
     renderCalendar();
