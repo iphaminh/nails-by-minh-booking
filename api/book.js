@@ -222,7 +222,7 @@ export default async function handler(req, res) {
       if (photoUrl && mmsOn) {
         params.MediaUrl = photoUrl;
       }
-      await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
+      const twRes = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
         method: 'POST',
         headers: {
           Authorization: 'Basic ' + Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64'),
@@ -230,6 +230,27 @@ export default async function handler(req, res) {
         },
         body: new URLSearchParams(params)
       });
+      const twData = await twRes.json();
+      if (!twRes.ok) {
+        console.error('Twilio SMS rejected:', twRes.status, JSON.stringify(twData));
+        // If the MMS media was the problem, retry once as plain SMS so
+        // Minh still gets notified about the booking.
+        if (params.MediaUrl) {
+          delete params.MediaUrl;
+          const retry = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
+            method: 'POST',
+            headers: {
+              Authorization: 'Basic ' + Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64'),
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams(params)
+          });
+          const retryData = await retry.json();
+          console.log('Plain SMS retry:', retry.ok ? 'sent OK' : 'also failed: ' + JSON.stringify(retryData));
+        }
+      } else {
+        console.log('Twilio SMS sent OK, sid:', twData.sid, params.MediaUrl ? '(with photo)' : '(no photo)');
+      }
     }
 
     // ── 8. Return success ──────────────────────────────────────────────
