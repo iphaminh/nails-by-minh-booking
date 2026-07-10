@@ -11,7 +11,8 @@ export default async function handler(req, res) {
     service, addons, inspoStyle, notes,
     bookingDate, bookingTime,
     subscribeText, subscribeEmail,
-    photoData, photoName
+    photoData, photoName,
+    smsConsent
   } = req.body;
 
   // Basic validation
@@ -101,7 +102,8 @@ export default async function handler(req, res) {
         subscribe_text: subscribeText || false,
         subscribe_email: subscribeEmail || false,
         photo_url: photoUrl,
-        photo_path: photoPath
+        photo_path: photoPath,
+        sms_consent: smsConsent === true
       })
     });
     const [booking] = await bookingRes.json();
@@ -209,6 +211,11 @@ export default async function handler(req, res) {
     const TWILIO_FROM  = process.env.TWILIO_FROM;
     const TWILIO_TO    = process.env.TWILIO_TO;
 
+    // ── 5. SMS to Minh (his own booking alert — not client-facing) ────
+    // NOTE: This texts Minh only. It is NOT gated by sms_consent because it
+    // does not go to the client. If a client-facing SMS is added in the
+    // future (e.g. confirmation or reminder text to the client), it MUST
+    // check `smsConsent === true` before sending, per A2P compliance.
     if (TWILIO_SID && TWILIO_TOKEN && TWILIO_FROM && TWILIO_TO) {
       const smsBody = `💅 New booking!\n${clientName}\n${service}\n${bookingDate} at ${bookingTime}\n📞 ${clientPhone}${notes ? `\n📝 ${notes}` : ''}`;
       const params = {
