@@ -75,6 +75,10 @@
     input.inp:focus,textarea.inp:focus { border-color:var(--gold); }
     textarea.inp { resize:none; height:80px; }
     .tog-box { background:var(--bg2); border-radius:var(--radius); padding:13px 14px; margin-bottom:14px; }
+    .sms-consent { display:flex; gap:9px; align-items:flex-start; background:var(--bg2); border-radius:var(--radius); padding:11px 12px; margin:-6px 0 14px 0; cursor:pointer; }
+    .sms-consent input[type="checkbox"] { margin-top:2px; width:16px; height:16px; accent-color:var(--gold); flex-shrink:0; cursor:pointer; }
+    .sms-consent span { font-size:11.5px; color:var(--text2); line-height:1.5; }
+    .sms-consent a { color:var(--gold); text-decoration:underline; }
     .tog-title { font-size:12px; font-weight:500; color:var(--text); margin-bottom:4px; }
     .tog-sub { font-size:11px; color:var(--text2); margin-bottom:10px; line-height:1.4; }
     .tog-row { display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--text); margin-bottom:8px; }
@@ -260,13 +264,15 @@
       <input class="inp" type="text" id="inp-name" placeholder="First name">
       <label class="lbl">Phone number *</label>
       <input class="inp" type="tel" id="inp-phone" placeholder="(408) 000-0000">
-      <div style="font-size:10.5px;color:var(--text3);line-height:1.5;margin:-8px 0 14px 2px">
-        By providing your phone number, you agree to receive appointment-related text
-        messages (confirmations &amp; reminders) from NailbyMinh. Message frequency varies.
-        Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help.
-        See our <a href="/privacy" target="_blank" style="color:var(--gold)">Privacy Policy</a>
-        and <a href="/terms" target="_blank" style="color:var(--gold)">Terms</a>.
-      </div>
+      <label class="sms-consent">
+        <input type="checkbox" id="sms-consent">
+        <span>
+          Yes, text me appointment confirmations and reminders.
+          Msg frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help.
+          See our <a href="/privacy" target="_blank">Privacy Policy</a>
+          and <a href="/terms" target="_blank">Terms</a>. (Optional — you can still book without this.)
+        </span>
+      </label>
       <label class="lbl">Email (get confirmation email)</label>
       <input class="inp" type="email" id="inp-email" placeholder="you@email.com">
       <label class="lbl">Referred by (optional)</label>
@@ -514,6 +520,7 @@
     const referrer = document.getElementById('inp-referrer').value.trim();
     const subText  = document.getElementById('tog-text').classList.contains('on');
     const subEmail = document.getElementById('tog-email').classList.contains('on');
+    const smsConsent = document.getElementById('sms-consent').checked;
     const errEl = document.getElementById('err-msg');
     errEl.style.display = 'none';
 
@@ -545,7 +552,8 @@
           photoData: uploadedPhoto ? uploadedPhoto.dataUrl : null,
           photoName: uploadedPhoto ? uploadedPhoto.name : null,
           bookingDate: selDate, bookingTime: selTime,
-          subscribeText: subText, subscribeEmail: subEmail
+          subscribeText: subText, subscribeEmail: subEmail,
+          smsConsent: smsConsent
         })
       });
       const data = await res.json();
@@ -596,6 +604,7 @@
     document.getElementById('inp-email').value = '';
     document.getElementById('inspo-notes').value = '';
     document.getElementById('inp-referrer').value = '';
+    document.getElementById('sms-consent').checked = false;
     uploadedPhoto = null;
     photoProcessing = null;
     document.getElementById('confirm-btn').disabled = false;
